@@ -40,7 +40,7 @@ public:
 	}
 
 	basic_wildcard(const string &pattern_, const bool icase_,
-		const char star_, const char any_)
+		const char star_ = '*', const char any_ = '?')
 	{
 		_star = star_;
 		_any = any_;
