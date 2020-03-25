@@ -65,6 +65,7 @@ public:
         _dfa.clear();
         _star = '*';
         _any = '?';
+        _negated = false;
     }
 
     bool match(const string &str_) const
