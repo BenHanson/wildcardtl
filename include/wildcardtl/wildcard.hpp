@@ -25,333 +25,341 @@ template<typename char_type>
 class basic_wildcard
 {
 public:
-	using string = std::basic_string<char_type>;
-	char _star;
-	char _any;
+    using string = std::basic_string<char_type>;
+    char _star = '*';
+    char _any = '?';
+    bool _negated = false;
 
-	basic_wildcard() :
-		_star('*'),
-		_any('?')
-	{
-	}
+    basic_wildcard()
+    {
+    }
 
-	~basic_wildcard()
-	{
-	}
+    ~basic_wildcard()
+    {
+    }
 
-	basic_wildcard(const string &pattern_, const bool icase_,
-		const char star_ = '*', const char any_ = '?')
-	{
-		_star = star_;
-		_any = any_;
-		build(pattern_.c_str(), pattern_.c_str() + pattern_.size(), icase_);
-	}
+    basic_wildcard(const string &pattern_, const bool icase_,
+        const char star_ = '*', const char any_ = '?')
+    {
+        _star = star_;
+        _any = any_;
+        build(pattern_.c_str(), pattern_.c_str() + pattern_.size(), icase_);
+    }
 
-	void assign(const string &pattern_, const bool icase_,
-		const char star_ = '*', const char any_ = '?')
-	{
-		clear();
-		_star = star_;
-		_any = any_;
-		build(pattern_.c_str(), pattern_.c_str() + pattern_.size(), icase_);
-	}
+    void assign(const string &pattern_, const bool icase_,
+        const char star_ = '*', const char any_ = '?')
+    {
+        clear();
+        _star = star_;
+        _any = any_;
+        build(pattern_.c_str(), pattern_.c_str() + pattern_.size(), icase_);
+    }
 
-	void locale(const std::locale &locale_)
-	{
-		_locale = locale_;
-	}
+    void locale(const std::locale &locale_)
+    {
+        _locale = locale_;
+    }
 
-	void clear()
-	{
-		_dfa.clear();
-		_star = '*';
-		_any = '?';
-	}
+    void clear()
+    {
+        _dfa.clear();
+        _star = '*';
+        _any = '?';
+    }
 
-	bool match(const string &str_) const
-	{
-		bool match_ = true;
-		const char_type *curr_ = str_.c_str();
-		const char_type *end_ = curr_ + str_.size();
-		std::size_t state_ = 0;
+    bool match(const string &str_) const
+    {
+        bool match_ = true;
+        const char_type *curr_ = str_.c_str();
+        const char_type *end_ = curr_ + str_.size();
+        std::size_t state_ = 0;
 
-		for (; curr_ < end_; ++curr_)
-		{
-			if (!_dfa[state_].match(*curr_, state_))
-			{
-				match_ = false;
-				break;
-			}
-		}
+        for (; curr_ < end_; ++curr_)
+        {
+            if (!_dfa[state_].match(*curr_, state_))
+            {
+                match_ = false;
+                break;
+            }
+        }
 
-		if (match_)
-		{
-			match_ = _dfa[state_]._end;
-		}
+        if (match_)
+        {
+            match_ = _dfa[state_]._end;
+        }
 
-		return match_;
-	}
+        if (_negated)
+            match_ ^= true;
+
+        return match_;
+    }
 
 protected:
-	using equivset = detail::basic_equivset<char_type>;
-	using equivset_list = std::list<std::unique_ptr<equivset>>;
-	using equivset_ptr = std::unique_ptr<equivset>;
-	using node = detail::basic_node<char_type>;
-	using node_set = std::set<const node *>;
-	using node_set_vector = std::vector<std::unique_ptr<node_set>>;
-	using node_vector = std::vector<const node *>;
-	using node_vector_vector = std::vector<std::unique_ptr<node_vector>>;
-	using parser = detail::basic_parser<char_type>;
-	using size_t_vector = std::vector<size_t>;
-	using string_token = basic_string_token<char_type>;
-	using token_list = std::list<std::unique_ptr<string_token>>;
-	using token_ptr = std::unique_ptr<string_token>;
-	std::locale _locale;
+    using equivset = detail::basic_equivset<char_type>;
+    using equivset_list = std::list<std::unique_ptr<equivset>>;
+    using equivset_ptr = std::unique_ptr<equivset>;
+    using node = detail::basic_node<char_type>;
+    using node_set = std::set<const node *>;
+    using node_set_vector = std::vector<std::unique_ptr<node_set>>;
+    using node_vector = std::vector<const node *>;
+    using node_vector_vector = std::vector<std::unique_ptr<node_vector>>;
+    using parser = detail::basic_parser<char_type>;
+    using size_t_vector = std::vector<size_t>;
+    using string_token = basic_string_token<char_type>;
+    using token_list = std::list<std::unique_ptr<string_token>>;
+    using token_ptr = std::unique_ptr<string_token>;
+    std::locale _locale;
 
-	struct transition
-	{
-		string_token _chars;
-		std::size_t _next;
+    struct transition
+    {
+        string_token _chars;
+        std::size_t _next;
 
-		transition(const string_token &chars_, const std::size_t next_) :
-			_chars(chars_),
-			_next(next_)
-		{
-		}
+        transition(const string_token &chars_, const std::size_t next_) :
+            _chars(chars_),
+            _next(next_)
+        {
+        }
 
-		bool match(const char_type c_, std::size_t &next_) const
-		{
-			bool match_ = false;
+        bool match(const char_type c_, std::size_t &next_) const
+        {
+            bool match_ = false;
 
-			match_ = _chars._charset.find(c_) != string_token::string::npos;
-			match_ ^= _chars._negated;
+            match_ = _chars._charset.find(c_) != string_token::string::npos;
+            match_ ^= _chars._negated;
 
-			if (match_)
-			{
-				next_ = _next;
-			}
+            if (match_)
+            {
+                next_ = _next;
+            }
 
-			return match_;
-		}
-	};
+            return match_;
+        }
+    };
 
-	struct state
-	{
-		using transition_deque = std::deque<transition>;
+    struct state
+    {
+        using transition_deque = std::deque<transition>;
 
-		bool _end;
-		transition_deque _transitions;
+        bool _end;
+        transition_deque _transitions;
 
-		state() :
-			_end(false)
-		{
-		}
+        state() :
+            _end(false)
+        {
+        }
 
-		bool match(const char_type c_, std::size_t &next_) const
-		{
-			bool match_ = false;
-			auto iter_ = _transitions.cbegin();
-			auto end_ = _transitions.cend();
+        bool match(const char_type c_, std::size_t &next_) const
+        {
+            bool match_ = false;
+            auto iter_ = _transitions.cbegin();
+            auto end_ = _transitions.cend();
 
-			for (; iter_ != end_; ++iter_)
-			{
-				if (iter_->match(c_, next_))
-				{
-					match_ = true;
-					break;
-				}
-			}
+            for (; iter_ != end_; ++iter_)
+            {
+                if (iter_->match(c_, next_))
+                {
+                    match_ = true;
+                    break;
+                }
+            }
 
-			return match_;
-		}
-	};
+            return match_;
+        }
+    };
 
-	using state_vector = std::vector<state>;
+    using state_vector = std::vector<state>;
 
-	state_vector _dfa;
+    state_vector _dfa;
 
-	void build(const char_type *curr_, const char_type *end_, const bool icase_)
-	{
-		typename parser::node_ptr_vector node_ptr_vector_;
-		node *root_ = parser::parse(curr_, end_, node_ptr_vector_, icase_,
-			_star, _any, _locale);
-		const typename node::node_vector *followpos_ = root_ ?
-			&root_->firstpos() : nullptr;
-		node_set_vector seen_sets_;
-		size_t_vector hash_vector_;
+    void build(const char_type *curr_, const char_type *end_, const bool icase_)
+    {
+        if (curr_ != end_)
+        {
+            if (*curr_ == '!')
+            {
+                _negated = true;
+                ++curr_;
+            }
+        }
 
-		if (root_ == nullptr)
-		{
-			state state_;
+        typename parser::node_ptr_vector node_ptr_vector_;
+        node *root_ = parser::parse(curr_, end_, node_ptr_vector_, icase_,
+            _star, _any, _locale);
+        const typename node::node_vector *followpos_ = root_ ?
+            &root_->firstpos() : nullptr;
+        node_set_vector seen_sets_;
+        size_t_vector hash_vector_;
 
-			state_._end = true;
-			_dfa.push_back(state_);
-		}
-		else
-		{
-			closure(*followpos_, seen_sets_, hash_vector_);
-		}
+        if (root_ == nullptr)
+        {
+            state state_;
 
-		for (std::size_t index_ = 0; index_ < seen_sets_.size(); ++index_)
-		{
-			equivset_list equiv_list_;
+            state_._end = true;
+            _dfa.push_back(state_);
+        }
+        else
+        {
+            closure(*followpos_, seen_sets_, hash_vector_);
+        }
 
-			build_equiv_list(*seen_sets_[index_].get(), equiv_list_);
+        for (std::size_t index_ = 0; index_ < seen_sets_.size(); ++index_)
+        {
+            equivset_list equiv_list_;
 
-			for (auto iter_ = equiv_list_.cbegin(), end_ = equiv_list_.cend();
-				iter_ != end_; ++iter_)
-			{
-				auto equivset_ = iter_->get();
-				const std::size_t transition_ = closure
-					(equivset_->_followpos, seen_sets_,
-					hash_vector_);
+            build_equiv_list(*seen_sets_[index_].get(), equiv_list_);
 
-				if (transition_ != npos)
-				{
-					_dfa[index_]._transitions.push_back
-						(transition(equivset_->_token, transition_));
-				}
-			}
-		}
-	}
+            for (const auto &equivset_ : equiv_list_)
+            {
+                const std::size_t transition_ = closure(equivset_->_followpos,
+                    seen_sets_, hash_vector_);
 
-	std::size_t closure(const typename node::node_vector &followpos_,
-		node_set_vector &seen_sets_, size_t_vector &hash_vector_)
-	{
-		bool end_state_ = false;
-		std::size_t hash_ = 0;
+                if (transition_ != npos)
+                {
+                    _dfa[index_]._transitions.push_back
+                        (transition(equivset_->_token, transition_));
+                }
+            }
+        }
+    }
 
-		if (followpos_.empty()) return npos;
+    std::size_t closure(const typename node::node_vector &followpos_,
+        node_set_vector &seen_sets_, size_t_vector &hash_vector_)
+    {
+        bool end_state_ = false;
+        std::size_t hash_ = 0;
 
-		std::size_t index_ = 0;
-		std::unique_ptr<node_set> set_ptr_(new node_set);
+        if (followpos_.empty()) return npos;
 
-		for (auto iter_ = followpos_.cbegin(), end_ = followpos_.cend();
-			iter_ != end_; ++iter_)
-		{
-			closure_ex(*iter_, end_state_, *set_ptr_.get(), hash_);
-		}
+        std::size_t index_ = 0;
+        std::unique_ptr<node_set> set_ptr_(new node_set);
 
-		bool found_ = false;
-		auto hash_iter_ = hash_vector_.cbegin();
-		auto hash_end_ = hash_vector_.cend();
-		auto set_iter_ = seen_sets_.cbegin();
+        for (auto iter_ = followpos_.cbegin(), end_ = followpos_.cend();
+            iter_ != end_; ++iter_)
+        {
+            closure_ex(*iter_, end_state_, *set_ptr_.get(), hash_);
+        }
 
-		for (; hash_iter_ != hash_end_; ++hash_iter_, ++set_iter_, ++index_)
-		{
-			found_ = *hash_iter_ == hash_ && *(*set_iter_) == *set_ptr_;
+        bool found_ = false;
+        auto hash_iter_ = hash_vector_.cbegin();
+        auto hash_end_ = hash_vector_.cend();
+        auto set_iter_ = seen_sets_.cbegin();
 
-			if (found_) break;
-		}
+        for (; hash_iter_ != hash_end_; ++hash_iter_, ++set_iter_, ++index_)
+        {
+            found_ = *hash_iter_ == hash_ && *(*set_iter_) == *set_ptr_;
 
-		if (!found_)
-		{
-			seen_sets_.emplace_back(std::move(set_ptr_));
-			hash_vector_.push_back(hash_);
+            if (found_) break;
+        }
 
-			const std::size_t old_size_ = _dfa.size();
+        if (!found_)
+        {
+            seen_sets_.emplace_back(std::move(set_ptr_));
+            hash_vector_.push_back(hash_);
 
-			_dfa.push_back(state());
-			_dfa[old_size_]._end = end_state_;
-		}
+            const std::size_t old_size_ = _dfa.size();
 
-		return index_;
-	}
+            _dfa.push_back(state());
+            _dfa[old_size_]._end = end_state_;
+        }
 
-	void closure_ex(node *node_, bool &end_state_, node_set &set_ptr_,
-		std::size_t &hash_)
-	{
-		const bool temp_end_state_ = node_->end_state();
+        return index_;
+    }
 
-		if (temp_end_state_)
-		{
-			end_state_ = true;
-		}
+    void closure_ex(node *node_, bool &end_state_, node_set &set_ptr_,
+        std::size_t &hash_)
+    {
+        const bool temp_end_state_ = node_->end_state();
 
-		if (set_ptr_.insert(node_).second)
-		{
-			hash_ += reinterpret_cast<std::size_t>(node_);
-		}
-	}
+        if (temp_end_state_)
+        {
+            end_state_ = true;
+        }
 
-	void build_equiv_list(const node_set &set_, equivset_list &lhs_)
-	{
-		equivset_list rhs_;
+        if (set_ptr_.insert(node_).second)
+        {
+            hash_ += reinterpret_cast<std::size_t>(node_);
+        }
+    }
 
-		fill_rhs_list(set_, rhs_);
+    void build_equiv_list(const node_set &set_, equivset_list &lhs_)
+    {
+        equivset_list rhs_;
 
-		if (!rhs_.empty())
-		{
-			equivset_ptr overlap_ = std::make_unique<equivset>();
+        fill_rhs_list(set_, rhs_);
 
-			lhs_.emplace_back(std::move(rhs_.front()));
-			rhs_.pop_front();
+        if (!rhs_.empty())
+        {
+            equivset_ptr overlap_ = std::make_unique<equivset>();
 
-			while (!rhs_.empty())
-			{
-				equivset_ptr r_(rhs_.front().release());
-				auto iter_ = lhs_.begin();
-				auto end_ = lhs_.end();
+            lhs_.emplace_back(std::move(rhs_.front()));
+            rhs_.pop_front();
 
-				rhs_.pop_front();
+            while (!rhs_.empty())
+            {
+                equivset_ptr r_(rhs_.front().release());
+                auto iter_ = lhs_.begin();
+                auto end_ = lhs_.end();
 
-				while (!r_->empty() && iter_ != end_)
-				{
-					auto l_iter_ = iter_;
+                rhs_.pop_front();
 
-					(*l_iter_)->intersect(*r_.get(), *overlap_.get());
+                while (!r_->empty() && iter_ != end_)
+                {
+                    auto l_iter_ = iter_;
 
-					if (overlap_->empty())
-					{
-						++iter_;
-					}
-					else if ((*l_iter_)->empty())
-					{
-						l_iter_->reset(overlap_.release());
-						overlap_ = std::make_unique<equivset>();
-						++iter_;
-					}
-					else if (r_->empty())
-					{
-						r_.reset(overlap_.release());
-						overlap_ = std::make_unique<equivset>();
-						break;
-					}
-					else
-					{
-						iter_ = lhs_.insert(++iter_, equivset_ptr());
-						iter_->reset(overlap_.release());
-						overlap_ = std::make_unique<equivset>();
-						++iter_;
-						end_ = lhs_.end();
-					}
-				}
+                    (*l_iter_)->intersect(*r_.get(), *overlap_.get());
 
-				if (!r_->empty())
-				{
-					lhs_.emplace_back(std::move(r_));
-				}
-			}
-		}
-	}
+                    if (overlap_->empty())
+                    {
+                        ++iter_;
+                    }
+                    else if ((*l_iter_)->empty())
+                    {
+                        l_iter_->reset(overlap_.release());
+                        overlap_ = std::make_unique<equivset>();
+                        ++iter_;
+                    }
+                    else if (r_->empty())
+                    {
+                        r_.reset(overlap_.release());
+                        overlap_ = std::make_unique<equivset>();
+                        break;
+                    }
+                    else
+                    {
+                        iter_ = lhs_.insert(++iter_, equivset_ptr());
+                        iter_->reset(overlap_.release());
+                        overlap_ = std::make_unique<equivset>();
+                        ++iter_;
+                        end_ = lhs_.end();
+                    }
+                }
 
-	void fill_rhs_list(const node_set &set_, equivset_list &list_)
-	{
-		auto iter_ = set_.cbegin();
-		auto end_ = set_.cend();
+                if (!r_->empty())
+                {
+                    lhs_.emplace_back(std::move(r_));
+                }
+            }
+        }
+    }
 
-		for (; iter_ != end_; ++iter_)
-		{
-			const node *node_ = *iter_;
+    void fill_rhs_list(const node_set &set_, equivset_list &list_)
+    {
+        auto iter_ = set_.cbegin();
+        auto end_ = set_.cend();
 
-			if (!node_->end_state())
-			{
-				const string_token token_ = node_->token();
+        for (; iter_ != end_; ++iter_)
+        {
+            const node *node_ = *iter_;
 
-				list_.emplace_back(std::make_unique<equivset>(token_, node_->followpos()));
-			}
-		}
-	}
+            if (!node_->end_state())
+            {
+                const string_token token_ = node_->token();
+
+                list_.emplace_back(std::make_unique<equivset>(token_, node_->followpos()));
+            }
+        }
+    }
 };
 
 using wildcard = basic_wildcard<char>;

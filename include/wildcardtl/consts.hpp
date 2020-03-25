@@ -12,9 +12,9 @@
 
 namespace wildcardtl
 {
-	const std::size_t num_chars = 256;
-	const std::size_t num_wchar_ts = WCHAR_MAX < 0x110000 ?
-		WCHAR_MAX : 0x110000;
+    const std::size_t num_chars = 256;
+    const std::size_t num_wchar_ts = WCHAR_MAX < 0x110000 ?
+        WCHAR_MAX : 0x110000;
 }
 
 #endif

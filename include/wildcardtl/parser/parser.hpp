@@ -22,69 +22,69 @@ template<typename char_type>
 class basic_parser
 {
 public:
-	using node = basic_node<char_type>;
-	using node_ptr_vector = std::vector<std::unique_ptr<node>>;
+    using node = basic_node<char_type>;
+    using node_ptr_vector = std::vector<std::unique_ptr<node>>;
 
-	static node *parse(const char_type * &curr_, const char_type *end_,
-		node_ptr_vector &node_ptr_vector_, const bool icase_,
-		const char star_, const char any_, const std::locale &locale_)
-	{
-		node *root_ = nullptr;
-		typename tokeniser::string_token chars_;
+    static node *parse(const char_type * &curr_, const char_type *end_,
+        node_ptr_vector &node_ptr_vector_, const bool icase_,
+        const char star_, const char any_, const std::locale &locale_)
+    {
+        node *root_ = nullptr;
+        typename tokeniser::string_token chars_;
 
-		while (curr_ < end_)
-		{
-			typename tokeniser::e_Token eToken = tokeniser::next(curr_, end_, chars_,
-				icase_, star_, any_, locale_);
-			node *node_ = nullptr;
+        while (curr_ < end_)
+        {
+            typename tokeniser::e_Token eToken = tokeniser::next(curr_, end_, chars_,
+                icase_, star_, any_, locale_);
+            node *node_ = nullptr;
 
-			switch (eToken)
-			{
-			case tokeniser::eZeroOrMore:
-				node_ptr_vector_.emplace_back(std::make_unique<leaf_node>(chars_));
-				node_ = node_ptr_vector_.back().get();
-				node_ptr_vector_.emplace_back(std::make_unique<iteration_node>(node_));
-				node_ = node_ptr_vector_.back().get();
-				break;
-			case tokeniser::eAny:
-			case tokeniser::eCharSet:
-				node_ptr_vector_.emplace_back(std::make_unique<leaf_node>(chars_));
-				node_ = node_ptr_vector_.back().get();
-				break;
-			}
+            switch (eToken)
+            {
+            case tokeniser::eZeroOrMore:
+                node_ptr_vector_.emplace_back(std::make_unique<leaf_node>(chars_));
+                node_ = node_ptr_vector_.back().get();
+                node_ptr_vector_.emplace_back(std::make_unique<iteration_node>(node_));
+                node_ = node_ptr_vector_.back().get();
+                break;
+            case tokeniser::eAny:
+            case tokeniser::eCharSet:
+                node_ptr_vector_.emplace_back(std::make_unique<leaf_node>(chars_));
+                node_ = node_ptr_vector_.back().get();
+                break;
+            }
 
-			if (root_)
-			{
-				node *lhs_ = root_;
+            if (root_)
+            {
+                node *lhs_ = root_;
 
-				node_ptr_vector_.emplace_back(std::make_unique<sequence_node>(lhs_, node_));
-				root_ = node_ptr_vector_.back().get();
-			}
-			else
-			{
-				root_ = node_;
-			}
-		}
+                node_ptr_vector_.emplace_back(std::make_unique<sequence_node>(lhs_, node_));
+                root_ = node_ptr_vector_.back().get();
+            }
+            else
+            {
+                root_ = node_;
+            }
+        }
 
-		if (root_)
-		{
-			node *rhs_ = nullptr;
+        if (root_)
+        {
+            node *rhs_ = nullptr;
 
-			node_ptr_vector_.emplace_back(std::make_unique<end_node>());
-			rhs_ = node_ptr_vector_.back().get();
-			node_ptr_vector_.emplace_back(std::make_unique<sequence_node>(root_, rhs_));
-			root_ = node_ptr_vector_.back().get();
-		}
+            node_ptr_vector_.emplace_back(std::make_unique<end_node>());
+            rhs_ = node_ptr_vector_.back().get();
+            node_ptr_vector_.emplace_back(std::make_unique<sequence_node>(root_, rhs_));
+            root_ = node_ptr_vector_.back().get();
+        }
 
-		return root_;
-	}
+        return root_;
+    }
 
 protected:
-	using end_node = basic_end_node<char_type>;
-	using iteration_node = basic_iteration_node<char_type>;
-	using leaf_node = basic_leaf_node<char_type>;
-	using sequence_node = basic_sequence_node<char_type>;
-	using tokeniser = basic_tokeniser<char_type>;
+    using end_node = basic_end_node<char_type>;
+    using iteration_node = basic_iteration_node<char_type>;
+    using leaf_node = basic_leaf_node<char_type>;
+    using sequence_node = basic_sequence_node<char_type>;
+    using tokeniser = basic_tokeniser<char_type>;
 };
 }
 }
