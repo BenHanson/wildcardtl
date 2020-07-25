@@ -34,21 +34,25 @@ public:
 
         while (curr_ < end_)
         {
-            typename tokeniser::e_Token eToken = tokeniser::next(curr_, end_, chars_,
-                icase_, star_, any_, locale_);
+            typename tokeniser::e_Token eToken =
+                tokeniser::next(curr_, end_, chars_, icase_, star_, any_,
+                    locale_);
             node *node_ = nullptr;
 
             switch (eToken)
             {
-            case tokeniser::eZeroOrMore:
-                node_ptr_vector_.emplace_back(std::make_unique<leaf_node>(chars_));
+            case tokeniser::e_Token::eZeroOrMore:
+                node_ptr_vector_.emplace_back(std::make_unique
+                    <leaf_node>(chars_));
                 node_ = node_ptr_vector_.back().get();
-                node_ptr_vector_.emplace_back(std::make_unique<iteration_node>(node_));
+                node_ptr_vector_.emplace_back(std::make_unique
+                    <iteration_node>(node_));
                 node_ = node_ptr_vector_.back().get();
                 break;
-            case tokeniser::eAny:
-            case tokeniser::eCharSet:
-                node_ptr_vector_.emplace_back(std::make_unique<leaf_node>(chars_));
+            case tokeniser::e_Token::eAny:
+            case tokeniser::e_Token::eCharSet:
+                node_ptr_vector_.emplace_back(std::make_unique
+                    <leaf_node>(chars_));
                 node_ = node_ptr_vector_.back().get();
                 break;
             }
@@ -57,7 +61,8 @@ public:
             {
                 node *lhs_ = root_;
 
-                node_ptr_vector_.emplace_back(std::make_unique<sequence_node>(lhs_, node_));
+                node_ptr_vector_.emplace_back(std::make_unique<sequence_node>
+                    (lhs_, node_));
                 root_ = node_ptr_vector_.back().get();
             }
             else
@@ -72,7 +77,8 @@ public:
 
             node_ptr_vector_.emplace_back(std::make_unique<end_node>());
             rhs_ = node_ptr_vector_.back().get();
-            node_ptr_vector_.emplace_back(std::make_unique<sequence_node>(root_, rhs_));
+            node_ptr_vector_.emplace_back(std::make_unique<sequence_node>
+                (root_, rhs_));
             root_ = node_ptr_vector_.back().get();
         }
 

@@ -57,7 +57,7 @@ public:
 
     virtual node_type what_type() const override
     {
-        return node::SEQUENCE;
+        return node::node_type::SEQUENCE;
     }
 
     virtual bool traverse(const_node_stack &node_stack_,
@@ -67,8 +67,8 @@ public:
 
         switch (_right->what_type())
         {
-        case node::SEQUENCE:
-        case node::ITERATION:
+        case node::node_type::SEQUENCE:
+        case node::node_type::ITERATION:
             perform_op_stack_.push(false);
             break;
         default:
@@ -97,7 +97,8 @@ private:
 
             node *lhs_ = new_node_stack_.top();
 
-            node_ptr_vector_.emplace_back(std::make_unique<basic_sequence_node>(lhs_, rhs_));
+            node_ptr_vector_.emplace_back(std::make_unique<basic_sequence_node>
+                (lhs_, rhs_));
             new_node_stack_.top() = node_ptr_vector_.back().get();
         }
         else

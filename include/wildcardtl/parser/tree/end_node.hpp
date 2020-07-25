@@ -39,7 +39,7 @@ public:
 
     virtual node_type what_type() const override
     {
-        return node::END;
+        return node::node_type::END;
     }
 
     virtual bool traverse(const_node_stack &/*node_stack_*/,

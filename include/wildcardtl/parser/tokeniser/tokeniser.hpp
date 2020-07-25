@@ -20,7 +20,7 @@ template<typename char_type, typename Traits = basic_char_traits<char_type> >
 class basic_tokeniser
 {
 public:
-    enum e_Token {eEOF, eZeroOrMore, eAny, eCharSet};
+    enum class e_Token {eEOF, eZeroOrMore, eAny, eCharSet};
 
     using string_token = basic_string_token<char_type>;
 
@@ -28,21 +28,21 @@ public:
         string_token &chars_, const bool icase_,
         const char star_, const char any_, const std::locale &locale_)
     {
-        e_Token eToken = eCharSet;
+        e_Token eToken = e_Token::eCharSet;
 
-        if (curr_ >= end_) return eEOF;
+        if (curr_ >= end_) return e_Token::eEOF;
 
         if (*curr_ == star_)
         {
             chars_._charset.clear();
             chars_._negated = true;
-            eToken = eZeroOrMore;
+            eToken = e_Token::eZeroOrMore;
         }
         else if (*curr_ == any_)
         {
             chars_._charset.clear();
             chars_._negated = true;
-            eToken = eAny;
+            eToken = e_Token::eAny;
         }
         else if (*curr_ == '[')
         {
@@ -155,7 +155,8 @@ protected:
                 "following '-'.");
         }
 
-        std::size_t range_end_ = static_cast<typename Traits::index_type>(*curr_);
+        std::size_t range_end_ =
+            static_cast<typename Traits::index_type>(*curr_);
 
         ++curr_;
 
@@ -166,7 +167,8 @@ protected:
                 "(missing ']').");
         }
 
-        std::size_t range_start_ = static_cast<typename Traits::index_type>(prev_);
+        std::size_t range_start_ =
+            static_cast<typename Traits::index_type>(prev_);
 
         // Semanic check
         if (range_end_ < range_start_)

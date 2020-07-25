@@ -22,7 +22,7 @@ template<typename char_type>
 class basic_node
 {
 public:
-    enum node_type {LEAF, SEQUENCE, ITERATION, END};
+    enum class node_type {LEAF, SEQUENCE, ITERATION, END};
 
     using bool_stack = std::stack<bool>;
     // stack and vector not owner of node pointers

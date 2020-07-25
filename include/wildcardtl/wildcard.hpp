@@ -357,7 +357,8 @@ protected:
             {
                 const string_token token_ = node_->token();
 
-                list_.emplace_back(std::make_unique<equivset>(token_, node_->followpos()));
+                list_.emplace_back(std::make_unique<equivset>
+                    (token_, node_->followpos()));
             }
         }
     }

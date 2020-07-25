@@ -44,7 +44,7 @@ public:
 
     virtual node_type what_type() const override
     {
-        return node::ITERATION;
+        return node::node_type::ITERATION;
     }
 
     virtual bool traverse(const_node_stack &node_stack_,
@@ -67,7 +67,8 @@ private:
         {
             node *ptr_ = new_node_stack_.top();
 
-            node_ptr_vector_.emplace_back(std::make_unique<basic_iteration_node>(ptr_));
+            node_ptr_vector_.emplace_back(std::make_unique
+                <basic_iteration_node>(ptr_));
             new_node_stack_.top() = node_ptr_vector_.back().get();
         }
         else
@@ -81,7 +82,8 @@ private:
     // No copy construction.
     basic_iteration_node(const basic_iteration_node &) = delete;
     // No assignment.
-    const basic_iteration_node &operator =(const basic_iteration_node &) = delete;
+    const basic_iteration_node &operator =
+        (const basic_iteration_node &) = delete;
 };
 }
 }

@@ -51,7 +51,7 @@ public:
 
     virtual node_type what_type() const override
     {
-        return node::LEAF;
+        return node::node_type::LEAF;
     }
 
     virtual bool traverse(const_node_stack &/*node_stack_*/,
@@ -83,7 +83,8 @@ private:
         node_stack &new_node_stack_, bool_stack &/*perform_op_stack_*/,
         bool &/*down_*/) const override
     {
-        node_ptr_vector_.emplace_back(std::make_unique<basic_leaf_node>(_token));
+        node_ptr_vector_.emplace_back(std::make_unique<basic_leaf_node>
+            (_token));
         new_node_stack_.push(node_ptr_vector_.back().get());
     }
 

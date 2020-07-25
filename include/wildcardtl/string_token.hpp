@@ -35,7 +35,8 @@ struct basic_string_token
         // Optimisation for very large charsets:
         // sorting via pointers is much quicker than
         // via iterators...
-        std::sort(const_cast<char_type *>(start_), const_cast<char_type *>(end_));
+        std::sort(const_cast<char_type *>(start_),
+            const_cast<char_type *>(end_));
         _charset.erase(std::unique(_charset.begin(), _charset.end()),
             _charset.end());
     }
