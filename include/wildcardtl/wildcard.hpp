@@ -26,8 +26,8 @@ class basic_wildcard
 {
 public:
     using string = std::basic_string<char_type>;
-    char _star = '*';
-    char _any = '?';
+    char_type _star = '*';
+    char_type _any = '?';
     bool _negated = false;
 
     basic_wildcard()
@@ -38,16 +38,34 @@ public:
     {
     }
 
-    basic_wildcard(const string &pattern_, const bool icase_,
-        const char star_ = '*', const char any_ = '?')
+    basic_wildcard(const char_type* first_, const char_type* second_,
+        const bool icase_, const char_type star_ = '*',
+        const char_type any_ = '?') :
+        _star(star_),
+        _any(any_)
     {
+        build(first_, second_, icase_);
+    }
+
+    basic_wildcard(const string& pattern_, const bool icase_,
+        const char_type star_ = '*', const char_type any_ = '?') :
+        basic_wildcard(pattern_.c_str(), pattern_.c_str() + pattern_.size(),
+            icase_, star_, any_)
+    {
+    }
+
+    void assign(const char_type* first_, const char_type* second_,
+        const bool icase_, const char_type star_ = '*',
+        const char_type any_ = '?')
+    {
+        clear();
         _star = star_;
         _any = any_;
-        build(pattern_.c_str(), pattern_.c_str() + pattern_.size(), icase_);
+        build(first_, second_, icase_);
     }
 
     void assign(const string &pattern_, const bool icase_,
-        const char star_ = '*', const char any_ = '?')
+        const char_type star_ = '*', const char_type any_ = '?')
     {
         clear();
         _star = star_;
