@@ -86,16 +86,28 @@ public:
         _negated = false;
     }
 
+    bool empty() const
+    {
+        return _dfa.empty();
+    }
+
     bool match(const string &str_) const
     {
         bool match_ = true;
-        const char_type *curr_ = str_.c_str();
-        const char_type *end_ = curr_ + str_.size();
+        const char_type *first_ = str_.c_str();
+        const char_type *second_ = first_ + str_.size();
+
+        return match(first_, second_);
+    }
+
+    bool match(const char_type* first_, const char_type* second_) const
+    {
+        bool match_ = true;
         std::size_t state_ = 0;
 
-        for (; curr_ < end_; ++curr_)
+        for (; first_ < second_; ++first_)
         {
-            if (!_dfa[state_].match(*curr_, state_))
+            if (!_dfa[state_].match(*first_, state_))
             {
                 match_ = false;
                 break;
