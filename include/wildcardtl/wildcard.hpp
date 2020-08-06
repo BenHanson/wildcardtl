@@ -93,7 +93,6 @@ public:
 
     bool match(const string &str_) const
     {
-        bool match_ = true;
         const char_type *first_ = str_.c_str();
         const char_type *second_ = first_ + str_.size();
 
