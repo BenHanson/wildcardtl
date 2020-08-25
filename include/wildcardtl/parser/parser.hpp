@@ -27,7 +27,8 @@ public:
 
     static node *parse(const char_type * &curr_, const char_type *end_,
         node_ptr_vector &node_ptr_vector_, const bool icase_,
-        const char star_, const char any_, const std::locale &locale_)
+        const char_type star_, const char_type any_, const char_type not_,
+        const std::locale &locale_)
     {
         node *root_ = nullptr;
         typename tokeniser::string_token chars_;
@@ -36,7 +37,7 @@ public:
         {
             typename tokeniser::e_Token eToken =
                 tokeniser::next(curr_, end_, chars_, icase_, star_, any_,
-                    locale_);
+                    not_, locale_);
             node *node_ = nullptr;
 
             switch (eToken)

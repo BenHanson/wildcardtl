@@ -25,8 +25,8 @@ public:
     using string_token = basic_string_token<char_type>;
 
     static e_Token next(const char_type * &curr_, const char_type *end_,
-        string_token &chars_, const bool icase_,
-        const char star_, const char any_, const std::locale &locale_)
+        string_token &chars_, const bool icase_, const char_type star_,
+        const char_type any_, const char_type not_, const std::locale &locale_)
     {
         e_Token eToken = e_Token::eCharSet;
 
@@ -46,7 +46,7 @@ public:
         }
         else if (*curr_ == '[')
         {
-            charset(curr_, end_, chars_, icase_, locale_);
+            charset(curr_, end_, chars_, icase_, not_, locale_);
             chars_.remove_duplicates();
             chars_.normalise();
         }
@@ -75,7 +75,8 @@ public:
 
 protected:
     static void charset(const char_type * &curr_, const char_type *end_,
-        string_token &chars_, const bool icase_, const std::locale &locale_)
+        string_token &chars_, const bool icase_, const char_type not_,
+        const std::locale &locale_)
     {
         char_type prev_ = 0;
 
@@ -88,7 +89,7 @@ protected:
                 "following '['.");
         }
 
-        chars_._negated = *curr_ == '^';
+        chars_._negated = *curr_ == not_;
 
         if (chars_._negated)
         {
