@@ -26,10 +26,6 @@ class basic_wildcard
 {
 public:
     using string = std::basic_string<char_type>;
-    char_type _star = '*';
-    char_type _any = '?';
-    char_type _not = '!';
-    bool _negated = false;
 
     basic_wildcard()
     {
@@ -40,9 +36,9 @@ public:
     }
 
     basic_wildcard(const char_type* first_, const char_type* second_,
-        const bool icase_, const char_type star_ = '*',
+        const bool icase_, const char_type zom_ = '*',
         const char_type any_ = '?', const char_type not_ = '!') :
-        _star(star_),
+        _zom(zom_),
         _any(any_),
         _not(not_)
     {
@@ -50,30 +46,30 @@ public:
     }
 
     basic_wildcard(const string& pattern_, const bool icase_,
-        const char_type star_ = '*', const char_type any_ = '?',
+        const char_type zom_ = '*', const char_type any_ = '?',
         const char_type not_ = '!') :
         basic_wildcard(pattern_.c_str(), pattern_.c_str() + pattern_.size(),
-            icase_, star_, any_, not_)
+            icase_, zom_, any_, not_)
     {
     }
 
     void assign(const char_type* first_, const char_type* second_,
-        const bool icase_, const char_type star_ = '*',
+        const bool icase_, const char_type zom_ = '*',
         const char_type any_ = '?', const char_type not_ = '!')
     {
         clear();
-        _star = star_;
+        _zom = zom_;
         _any = any_;
         _not = not_;
         build(first_, second_, icase_);
     }
 
     void assign(const string &pattern_, const bool icase_,
-        const char_type star_ = '*', const char_type any_ = '?',
+        const char_type zom_ = '*', const char_type any_ = '?',
         const char_type not_ = '!')
     {
         clear();
-        _star = star_;
+        _zom = zom_;
         _any = any_;
         _not = not_;
         build(pattern_.c_str(), pattern_.c_str() + pattern_.size(), icase_);
@@ -87,7 +83,7 @@ public:
     void clear()
     {
         _dfa.clear();
-        _star = '*';
+        _zom = '*';
         _any = '?';
         _not = '!';
         _negated = false;
@@ -145,6 +141,11 @@ protected:
     using string_token = basic_string_token<char_type>;
     using token_list = std::list<std::unique_ptr<string_token>>;
     using token_ptr = std::unique_ptr<string_token>;
+
+    char_type _zom = '*';
+    char_type _any = '?';
+    char_type _not = '!';
+    bool _negated = false;
     std::locale _locale;
 
     struct transition
@@ -222,7 +223,7 @@ protected:
 
         typename parser::node_ptr_vector node_ptr_vector_;
         node *root_ = parser::parse(curr_, end_, node_ptr_vector_, icase_,
-            _star, _any, _not, _locale);
+            _zom, _any, _not, _locale);
         const typename node::node_vector *followpos_ = root_ ?
             &root_->firstpos() : nullptr;
         node_set_vector seen_sets_;

@@ -56,6 +56,8 @@ public:
                     <leaf_node>(chars_));
                 node_ = node_ptr_vector_.back().get();
                 break;
+            default:
+                break;
             }
 
             if (root_)

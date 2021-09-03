@@ -25,14 +25,14 @@ public:
     using string_token = basic_string_token<char_type>;
 
     static e_Token next(const char_type * &curr_, const char_type *end_,
-        string_token &chars_, const bool icase_, const char_type star_,
+        string_token &chars_, const bool icase_, const char_type zom_,
         const char_type any_, const char_type not_, const std::locale &locale_)
     {
         e_Token eToken = e_Token::eCharSet;
 
         if (curr_ >= end_) return e_Token::eEOF;
 
-        if (*curr_ == star_)
+        if (*curr_ == zom_)
         {
             chars_._charset.clear();
             chars_._negated = true;
