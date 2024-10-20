@@ -36,9 +36,9 @@ struct basic_char_traits<char>
     static index_type max_val()
     {
         // Prevent annoying warning (VC++)
-        index_type zero_ = 0;
+        const index_type zero_ = 0;
 
-        return ~zero_;
+        return ~zero_ & 0xff;
     }
 };
 }

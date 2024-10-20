@@ -37,7 +37,7 @@ public:
     {
     }
 
-    basic_node(const bool nullable_) :
+    explicit basic_node(const bool nullable_) :
         _nullable(nullable_)
     {
     }
@@ -67,46 +67,6 @@ public:
     {
         throw runtime_error("Internal error node::append_followpos()");
     }
-
-    basic_node *copy(node_ptr_vector &node_ptr_vector_) const
-    {
-        basic_node *new_root_ = nullptr;
-        const_node_stack node_stack_;
-        bool_stack perform_op_stack_;
-        bool down_ = true;
-        node_stack new_node_stack_;
-
-        node_stack_.push(this);
-
-        while (!node_stack_.empty())
-        {
-            while (down_)
-            {
-                down_ = node_stack_.top()->traverse(node_stack_,
-                    perform_op_stack_);
-            }
-
-            while (!down_ && !node_stack_.empty())
-            {
-                const basic_node *top_ = node_stack_.top();
-
-                top_->copy_node(node_ptr_vector_, new_node_stack_,
-                    perform_op_stack_, down_);
-
-                if (!down_) node_stack_.pop();
-            }
-        }
-
-        assert(new_node_stack_.size() == 1);
-        new_root_ = new_node_stack_.top();
-        new_node_stack_.pop();
-        return new_root_;
-    }
-
-    virtual node_type what_type() const = 0;
-
-    virtual bool traverse(const_node_stack &node_stack_,
-        bool_stack &perform_op_stack_) const = 0;
 
     node_vector &firstpos()
     {
@@ -144,16 +104,11 @@ public:
         throw runtime_error("Internal error node::followpos()");
     }
 
-protected:
+private:
     const bool _nullable;
     node_vector _firstpos;
     node_vector _lastpos;
 
-    virtual void copy_node(node_ptr_vector &node_ptr_vector_,
-        node_stack &new_node_stack_, bool_stack &perform_op_stack_,
-        bool &down_) const = 0;
-
-private:
     // No copy construction.
     basic_node(const basic_node &) = delete;
     // No assignment.

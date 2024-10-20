@@ -69,7 +69,7 @@ struct basic_string_token
         _negated = !_negated;
         temp_.resize(max_chars_ - _charset.size());
 
-        char_type *ptr_ = const_cast<char_type *>(temp_.c_str());
+        char_type* ptr_ = &temp_.front();
         std::size_t i_ = 0;
 
         while (curr_ < chars_end_)
@@ -97,10 +97,11 @@ struct basic_string_token
         _charset = temp_;
     }
 
-    bool operator <(const basic_string_token &rhs_) const
+    friend bool operator <(const basic_string_token& lhs_,
+        const basic_string_token &rhs_)
     {
-        return _negated < rhs_._negated ||
-            (_negated == rhs_._negated && _charset < rhs_._charset);
+        return lhs_._negated < rhs_._negated ||
+            (lhs_._negated == rhs_._negated && lhs_._charset < rhs_._charset);
     }
 
     bool empty() const
@@ -144,10 +145,10 @@ private:
         }
         else
         {
-            typename string::iterator iter_ = _charset.begin();
-            typename string::iterator end_ = _charset.end();
-            typename string::iterator rhs_iter_ = rhs_._charset.begin();
-            typename string::iterator rhs_end_ = rhs_._charset.end();
+            auto iter_ = _charset.begin();
+            auto end_ = _charset.end();
+            auto rhs_iter_ = rhs_._charset.begin();
+            auto rhs_end_ = rhs_._charset.end();
 
             overlap_._negated = _negated;
 
@@ -257,10 +258,10 @@ private:
         }
         else // rhs_._negated == true
         {
-            typename string::iterator iter_ = _charset.begin();
-            typename string::iterator end_ = _charset.end();
-            typename string::iterator rhs_iter_ = rhs_._charset.begin();
-            typename string::iterator rhs_end_ = rhs_._charset.end();
+            auto iter_ = _charset.begin();
+            auto end_ = _charset.end();
+            auto rhs_iter_ = rhs_._charset.begin();
+            auto rhs_end_ = rhs_._charset.end();
 
             while (iter_ != end_ && rhs_iter_ != rhs_end_)
             {

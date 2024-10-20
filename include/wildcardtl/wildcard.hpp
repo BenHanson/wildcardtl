@@ -31,10 +31,6 @@ public:
     {
     }
 
-    ~basic_wildcard()
-    {
-    }
-
     basic_wildcard(const char_type* first_, const char_type* second_,
         const bool icase_, const char_type zom_ = '*',
         const char_type any_ = '?', const char_type not_ = '!') :
@@ -142,12 +138,6 @@ protected:
     using token_list = std::list<std::unique_ptr<string_token>>;
     using token_ptr = std::unique_ptr<string_token>;
 
-    char_type _zom = '*';
-    char_type _any = '?';
-    char_type _not = '!';
-    bool _negated = false;
-    std::locale _locale;
-
     struct transition
     {
         string_token _chars;
@@ -205,10 +195,6 @@ protected:
             return match_;
         }
     };
-
-    using state_vector = std::vector<state>;
-
-    state_vector _dfa;
 
     void build(const char_type *curr_, const char_type *end_, const bool icase_)
     {
@@ -399,6 +385,16 @@ protected:
             }
         }
     }
+
+private:
+    using state_vector = std::vector<state>;
+
+    char_type _zom = '*';
+    char_type _any = '?';
+    char_type _not = '!';
+    bool _negated = false;
+    std::locale _locale;
+    state_vector _dfa;
 };
 
 using wildcard = basic_wildcard<char>;
