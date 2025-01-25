@@ -7,8 +7,8 @@
 #ifndef WILDCARDTL_CONSTS_H
 #define WILDCARDTL_CONSTS_H
 
-#include "size_t.hpp"
-#include <wchar.h>
+#include <cwchar>
+#include <cstddef>
 
 namespace wildcardtl
 {

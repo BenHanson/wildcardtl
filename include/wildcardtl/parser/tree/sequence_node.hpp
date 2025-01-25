@@ -7,6 +7,8 @@
 #ifndef WILDCARDTL_SEQUENCE_NODE_HPP
 #define WILDCARDTL_SEQUENCE_NODE_HPP
 
+#include "node.hpp"
+
 namespace wildcardtl
 {
 namespace detail
@@ -23,7 +25,7 @@ public:
     using node_vector = typename node::node_vector;
     using node_type = typename node::node_type;
 
-    basic_sequence_node(node *left_, node *right_) :
+    basic_sequence_node(node* left_, node* right_) :
         node(left_->nullable() && right_->nullable()),
         _left(left_),
         _right(right_)
@@ -42,10 +44,10 @@ public:
 
         _right->append_lastpos(node::lastpos());
 
-        node_vector &lastpos_ = _left->lastpos();
-        const node_vector &firstpos_ = _right->firstpos();
+        node_vector& lastpos_ = _left->lastpos();
+        const node_vector& firstpos_ = _right->firstpos();
 
-        for (node *node_ : lastpos_)
+        for (node* node_ : lastpos_)
         {
             node_->append_followpos(firstpos_);
         }
@@ -57,13 +59,13 @@ public:
 
 private:
     // Not owner of these pointers...
-    node *_left;
-    node *_right;
+    node* _left;
+    node* _right;
 
     // No copy construction.
-    basic_sequence_node(const basic_sequence_node &) = delete;
+    basic_sequence_node(const basic_sequence_node&) = delete;
     // No assignment.
-    const basic_sequence_node &operator =(const basic_sequence_node &) = delete;
+    const basic_sequence_node& operator =(const basic_sequence_node&) = delete;
 };
 }
 }

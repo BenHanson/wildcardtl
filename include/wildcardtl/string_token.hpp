@@ -7,9 +7,9 @@
 #ifndef WILDCARDTL_STRING_TOKEN_HPP
 #define WILDCARDTL_STRING_TOKEN_HPP
 
-#include <algorithm>
 #include "consts.hpp"
-#include "size_t.hpp"
+
+#include <algorithm>
 #include <string>
 
 namespace wildcardtl
@@ -29,14 +29,14 @@ struct basic_string_token
 
     void remove_duplicates()
     {
-        const char_type *start_ = _charset.c_str();
-        const char_type *end_ = start_ + _charset.size();
+        const char_type* start_ = _charset.c_str();
+        const char_type* end_ = start_ + _charset.size();
 
         // Optimisation for very large charsets:
         // sorting via pointers is much quicker than
         // via iterators...
-        std::sort(const_cast<char_type *>(start_),
-            const_cast<char_type *>(end_));
+        std::sort(const_cast<char_type*>(start_),
+            const_cast<char_type*>(end_));
         _charset.erase(std::unique(_charset.begin(), _charset.end()),
             _charset.end());
     }
@@ -63,8 +63,8 @@ struct basic_string_token
             num_chars : num_wchar_ts;
         char_type curr_char_ = sizeof(char_type) == 1 ? -128 : 0;
         string temp_;
-        const char_type *curr_ = _charset.c_str();
-        const char_type *chars_end_ = curr_ + _charset.size();
+        const char_type* curr_ = _charset.c_str();
+        const char_type* chars_end_ = curr_ + _charset.size();
 
         _negated = !_negated;
         temp_.resize(max_chars_ - _charset.size());
@@ -98,7 +98,7 @@ struct basic_string_token
     }
 
     friend bool operator <(const basic_string_token& lhs_,
-        const basic_string_token &rhs_)
+        const basic_string_token& rhs_)
     {
         return lhs_._negated < rhs_._negated ||
             (lhs_._negated == rhs_._negated && lhs_._charset < rhs_._charset);
@@ -120,7 +120,7 @@ struct basic_string_token
         _charset.clear();
     }
 
-    void intersect(basic_string_token &rhs_, basic_string_token &overlap_)
+    void intersect(basic_string_token& rhs_, basic_string_token& overlap_)
     {
         if ((any() && rhs_.any()) || (_negated == rhs_._negated &&
             !any() && !rhs_.any()))
@@ -134,8 +134,8 @@ struct basic_string_token
     }
 
 private:
-    void intersect_same_types(basic_string_token &rhs_,
-        basic_string_token &overlap_)
+    void intersect_same_types(basic_string_token& rhs_,
+        basic_string_token& overlap_)
     {
         if (any())
         {
@@ -200,8 +200,8 @@ private:
         }
     }
 
-    void intersect_diff_types(basic_string_token &rhs_,
-        basic_string_token &overlap_)
+    void intersect_diff_types(basic_string_token& rhs_,
+        basic_string_token& overlap_)
     {
         if (any())
         {
@@ -217,7 +217,7 @@ private:
         }
     }
 
-    void intersect_any(basic_string_token &rhs_, basic_string_token &overlap_)
+    void intersect_any(basic_string_token& rhs_, basic_string_token& overlap_)
     {
         if (rhs_._negated)
         {
@@ -229,8 +229,8 @@ private:
         }
     }
 
-    void intersect_negated(basic_string_token &rhs_,
-        basic_string_token &overlap_)
+    void intersect_negated(basic_string_token& rhs_,
+        basic_string_token& overlap_)
     {
         if (rhs_.any())
         {
@@ -246,8 +246,8 @@ private:
         }
     }
 
-    void intersect_charset(basic_string_token &rhs_,
-        basic_string_token &overlap_)
+    void intersect_charset(basic_string_token& rhs_,
+        basic_string_token& overlap_)
     {
         if (rhs_.any())
         {
@@ -309,7 +309,7 @@ private:
         }
     }
 
-    void merge(string &src_, string &dest_)
+    void merge(string& src_, string& dest_)
     {
         string tmp_(src_.size() + dest_.size(), 0);
 

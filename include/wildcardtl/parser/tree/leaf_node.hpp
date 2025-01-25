@@ -7,9 +7,7 @@
 #ifndef WILDCARDTL_LEAF_NODE_HPP
 #define WILDCARDTL_LEAF_NODE_HPP
 
-#include "../../consts.hpp" // null_token
 #include "node.hpp"
-#include "../../size_t.hpp"
 
 namespace wildcardtl
 {
@@ -28,7 +26,7 @@ public:
     using string_token = typename node::string_token;
     using node_type = typename node::node_type;
 
-    explicit basic_leaf_node(const string_token &token_) :
+    explicit basic_leaf_node(const string_token& token_) :
         node(false),
         _token(token_)
     {
@@ -43,23 +41,23 @@ public:
     {
     }
 
-    void append_followpos(const node_vector &followpos_) override
+    void append_followpos(const node_vector& followpos_) override
     {
         _followpos.insert(_followpos.end(),
             followpos_.begin(), followpos_.end());
     }
 
-    const string_token &token() const override
+    const string_token& token() const override
     {
         return _token;
     }
 
-    const node_vector &followpos() const override
+    const node_vector& followpos() const override
     {
         return _followpos;
     }
 
-    node_vector &followpos() override
+    node_vector& followpos() override
     {
         return _followpos;
     }
@@ -69,9 +67,9 @@ private:
     node_vector _followpos;
 
     // No copy construction.
-    basic_leaf_node(const basic_leaf_node &) = delete;
+    basic_leaf_node(const basic_leaf_node&) = delete;
     // No assignment.
-    const basic_leaf_node &operator =(const basic_leaf_node &) = delete;
+    const basic_leaf_node& operator =(const basic_leaf_node&) = delete;
 };
 }
 }

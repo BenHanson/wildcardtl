@@ -8,9 +8,10 @@
 #define WILDCARDTL_TOKENISER_HPP
 
 #include "../../char_traits.hpp"
-#include <locale>
 #include "../../runtime_error.hpp"
 #include "../../string_token.hpp"
+
+#include <locale>
 
 namespace wildcardtl
 {
@@ -24,9 +25,9 @@ public:
 
     using string_token = basic_string_token<char_type>;
 
-    static e_Token next(const char_type * &curr_, const char_type *end_,
-        string_token &chars_, const bool icase_, const char_type zom_,
-        const char_type any_, const char_type not_, const std::locale &locale_)
+    static e_Token next(const char_type*& curr_, const char_type* end_,
+        string_token& chars_, const bool icase_, const char_type zom_,
+        const char_type any_, const char_type not_, const std::locale& locale_)
     {
         e_Token eToken = e_Token::eCharSet;
 
@@ -74,9 +75,9 @@ public:
     }
 
 protected:
-    static void charset(const char_type * &curr_, const char_type *end_,
-        string_token &chars_, const bool icase_, const char_type not_,
-        const std::locale &locale_)
+    static void charset(const char_type*& curr_, const char_type* end_,
+        string_token& chars_, const bool icase_, const char_type not_,
+        const std::locale& locale_)
     {
         char_type prev_ = 0;
 
@@ -143,9 +144,9 @@ protected:
         }
     }
 
-    static void charset_range(const char_type prev_, const char_type * &curr_,
-        const char_type *end_, string_token &chars_, const bool icase_,
-        const std::locale &locale_)
+    static void charset_range(const char_type prev_, const char_type*& curr_,
+        const char_type* end_, string_token& chars_, const bool icase_,
+        const std::locale& locale_)
     {
         ++curr_;
 

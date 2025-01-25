@@ -8,7 +8,6 @@
 #define WILDCARDTL_END_NODE_HPP
 
 #include "node.hpp"
-#include "../../size_t.hpp"
 
 namespace wildcardtl
 {
@@ -37,7 +36,7 @@ public:
     {
     }
 
-    const node_vector &followpos() const override
+    const node_vector& followpos() const override
     {
         // _followpos is always empty..!
         return _followpos;
@@ -52,9 +51,9 @@ private:
     node_vector _followpos;
 
     // No copy construction.
-    basic_end_node(const basic_end_node &) = delete;
+    basic_end_node(const basic_end_node&) = delete;
     // No assignment.
-    const basic_end_node &operator =(const basic_end_node &) = delete;
+    const basic_end_node& operator =(const basic_end_node&) = delete;
 };
 }
 }

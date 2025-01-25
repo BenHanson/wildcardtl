@@ -7,15 +7,18 @@
 #ifndef WILDCARD_HPP
 #define WILDCARD_HPP
 
-#include <deque>
 #include "partition/equivset.hpp"
+#include "parser/tree/node.hpp"
+#include "parser/parser.hpp"
+#include "string_token.hpp"
+
+#include <deque>
 #include <list>
 #include <locale>
 #include <memory>
-#include "parser/tree/node.hpp"
-#include "parser/parser.hpp"
 #include <set>
-#include "string_token.hpp"
+#include <string>
+#include <vector>
 
 namespace wildcardtl
 {
@@ -60,7 +63,7 @@ public:
         build(first_, second_, icase_);
     }
 
-    void assign(const string &pattern_, const bool icase_,
+    void assign(const string& pattern_, const bool icase_,
         const char_type zom_ = '*', const char_type any_ = '?',
         const char_type not_ = '!')
     {
@@ -71,7 +74,7 @@ public:
         build(pattern_.c_str(), pattern_.c_str() + pattern_.size(), icase_);
     }
 
-    void locale(const std::locale &locale_)
+    void locale(const std::locale& locale_)
     {
         _locale = locale_;
     }
@@ -90,10 +93,10 @@ public:
         return _dfa.empty();
     }
 
-    bool match(const string &str_) const
+    bool match(const string& str_) const
     {
-        const char_type *first_ = str_.c_str();
-        const char_type *second_ = first_ + str_.size();
+        const char_type* first_ = str_.c_str();
+        const char_type* second_ = first_ + str_.size();
 
         return match(first_, second_);
     }
@@ -128,9 +131,9 @@ protected:
     using equivset_list = std::list<std::unique_ptr<equivset>>;
     using equivset_ptr = std::unique_ptr<equivset>;
     using node = detail::basic_node<char_type>;
-    using node_set = std::set<const node *>;
+    using node_set = std::set<const node*>;
     using node_set_vector = std::vector<std::unique_ptr<node_set>>;
-    using node_vector = std::vector<const node *>;
+    using node_vector = std::vector<const node*>;
     using node_vector_vector = std::vector<std::unique_ptr<node_vector>>;
     using parser = detail::basic_parser<char_type>;
     using size_t_vector = std::vector<size_t>;
@@ -143,13 +146,13 @@ protected:
         string_token _chars;
         std::size_t _next;
 
-        transition(const string_token &chars_, const std::size_t next_) :
+        transition(const string_token& chars_, const std::size_t next_) :
             _chars(chars_),
             _next(next_)
         {
         }
 
-        bool match(const char_type c_, std::size_t &next_) const
+        bool match(const char_type c_, std::size_t& next_) const
         {
             bool match_ = false;
 
@@ -169,15 +172,10 @@ protected:
     {
         using transition_deque = std::deque<transition>;
 
-        bool _end;
+        bool _end = false;
         transition_deque _transitions;
 
-        state() :
-            _end(false)
-        {
-        }
-
-        bool match(const char_type c_, std::size_t &next_) const
+        bool match(const char_type c_, std::size_t& next_) const
         {
             bool match_ = false;
             auto iter_ = _transitions.cbegin();
@@ -196,7 +194,7 @@ protected:
         }
     };
 
-    void build(const char_type *curr_, const char_type *end_, const bool icase_)
+    void build(const char_type* curr_, const char_type* end_, const bool icase_)
     {
         if (curr_ != end_)
         {
@@ -207,19 +205,18 @@ protected:
             }
         }
 
-        typename parser::node_ptr_vector node_ptr_vector_;
-        node *root_ = parser::parse(curr_, end_, node_ptr_vector_, icase_,
+        node_ptr_vector node_ptr_vector_;
+        node* root_ = parser::parse(curr_, end_, node_ptr_vector_, icase_,
             _zom, _any, _not, _locale);
-        const typename node::node_vector *followpos_ = root_ ?
+        const typename node::node_vector* followpos_ = root_ ?
             &root_->firstpos() : nullptr;
         node_set_vector seen_sets_;
         size_t_vector hash_vector_;
 
         if (root_ == nullptr)
         {
-            state state_;
+            state state_{ true };
 
-            state_._end = true;
             _dfa.push_back(state_);
         }
         else
@@ -233,7 +230,7 @@ protected:
 
             build_equiv_list(*seen_sets_[index_].get(), equiv_list_);
 
-            for (const auto &equivset_ : equiv_list_)
+            for (const auto& equivset_ : equiv_list_)
             {
                 const std::size_t transition_ = closure(equivset_->_followpos,
                     seen_sets_, hash_vector_);
@@ -247,8 +244,8 @@ protected:
         }
     }
 
-    std::size_t closure(const typename node::node_vector &followpos_,
-        node_set_vector &seen_sets_, size_t_vector &hash_vector_)
+    std::size_t closure(const typename node::node_vector& followpos_,
+        node_set_vector& seen_sets_, size_t_vector& hash_vector_)
     {
         bool end_state_ = false;
         std::size_t hash_ = 0;
@@ -290,8 +287,8 @@ protected:
         return index_;
     }
 
-    void closure_ex(node *node_, bool &end_state_, node_set &set_ptr_,
-        std::size_t &hash_)
+    void closure_ex(node* node_, bool& end_state_, node_set& set_ptr_,
+        std::size_t& hash_)
     {
         const bool temp_end_state_ = node_->end_state();
 
@@ -306,7 +303,7 @@ protected:
         }
     }
 
-    void build_equiv_list(const node_set &set_, equivset_list &lhs_)
+    void build_equiv_list(const node_set& set_, equivset_list& lhs_)
     {
         equivset_list rhs_;
 
@@ -367,14 +364,14 @@ protected:
         }
     }
 
-    void fill_rhs_list(const node_set &set_, equivset_list &list_)
+    void fill_rhs_list(const node_set& set_, equivset_list& list_)
     {
         auto iter_ = set_.cbegin();
         auto end_ = set_.cend();
 
         for (; iter_ != end_; ++iter_)
         {
-            const node *node_ = *iter_;
+            const node* node_ = *iter_;
 
             if (!node_->end_state())
             {
@@ -387,6 +384,7 @@ protected:
     }
 
 private:
+    using node_ptr_vector = typename parser::node_ptr_vector;
     using state_vector = std::vector<state>;
 
     char_type _zom = '*';

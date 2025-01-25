@@ -7,11 +7,11 @@
 #ifndef WILDCARDTL_EQUIVSET_HPP
 #define WILDCARDTL_EQUIVSET_HPP
 
-#include <algorithm>
 #include "../parser/tree/node.hpp"
-#include <set>
-#include "../size_t.hpp"
 #include "../string_token.hpp"
+
+#include <set>
+#include <vector>
 
 namespace wildcardtl
 {
@@ -23,7 +23,7 @@ struct basic_equivset
     using node = basic_node<char_type>;
     using node_set = std::set<node>;
     // Not owner of nodes:
-    using node_vector = std::vector<node *>;
+    using node_vector = std::vector<node*>;
     using string_token = basic_string_token<char_type>;
 
     string_token _token;
@@ -33,7 +33,7 @@ struct basic_equivset
     {
     }
 
-    basic_equivset(const string_token &token_, const node_vector &followpos_) :
+    basic_equivset(const string_token& token_, const node_vector& followpos_) :
         _token(token_),
         _followpos(followpos_)
     {
@@ -44,7 +44,7 @@ struct basic_equivset
         return _token.empty() && _followpos.empty();
     }
 
-    void intersect(basic_equivset &rhs_, basic_equivset &overlap_)
+    void intersect(basic_equivset& rhs_, basic_equivset& overlap_)
     {
         _token.intersect(rhs_._token, overlap_._token);
 
@@ -55,7 +55,7 @@ struct basic_equivset
             auto overlap_begin_ = overlap_._followpos.cbegin();
             auto overlap_end_ = overlap_._followpos.cend();
 
-            for (node *node_ : rhs_._followpos)
+            for (node* node_ : rhs_._followpos)
             {
                 if (std::find(overlap_begin_, overlap_end_, node_) ==
                     overlap_end_)

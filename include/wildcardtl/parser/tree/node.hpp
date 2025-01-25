@@ -7,11 +7,11 @@
 #ifndef WILDCARDTL_NODE_HPP
 #define WILDCARDTL_NODE_HPP
 
-#include <assert.h>
-#include <memory>
 #include "../../runtime_error.hpp"
-#include <stack>
 #include "../../string_token.hpp"
+
+#include <memory>
+#include <stack>
 #include <vector>
 
 namespace wildcardtl
@@ -26,9 +26,9 @@ public:
 
     using bool_stack = std::stack<bool>;
     // stack and vector not owner of node pointers
-    using node_stack = std::stack<basic_node *>;
-    using const_node_stack = std::stack<const basic_node *>;
-    using node_vector = std::vector<basic_node *>;
+    using node_stack = std::stack<basic_node*>;
+    using const_node_stack = std::stack<const basic_node*>;
+    using node_vector = std::vector<basic_node*>;
     using node_ptr_vector = std::vector<std::unique_ptr<basic_node>>;
     using string_token = basic_string_token<char_type>;
 
@@ -51,35 +51,35 @@ public:
         return _nullable;
     }
 
-    void append_firstpos(node_vector &firstpos_) const
+    void append_firstpos(node_vector& firstpos_) const
     {
         firstpos_.insert(firstpos_.end(),
             _firstpos.begin(), _firstpos.end());
     }
 
-    void append_lastpos(node_vector &lastpos_) const
+    void append_lastpos(node_vector& lastpos_) const
     {
         lastpos_.insert(lastpos_.end(),
             _lastpos.begin(), _lastpos.end());
     }
 
-    virtual void append_followpos(const node_vector &/*followpos_*/)
+    virtual void append_followpos(const node_vector& /*followpos_*/)
     {
         throw runtime_error("Internal error node::append_followpos()");
     }
 
-    node_vector &firstpos()
+    node_vector& firstpos()
     {
         return _firstpos;
     }
 
-    const node_vector &firstpos() const
+    const node_vector& firstpos() const
     {
         return _firstpos;
     }
 
     // _lastpos modified externally, so not const &
-    node_vector &lastpos()
+    node_vector& lastpos()
     {
         return _lastpos;
     }
@@ -89,17 +89,17 @@ public:
         return false;
     }
 
-    virtual const string_token &token() const
+    virtual const string_token& token() const
     {
         throw runtime_error("Internal error node::token()");
     }
 
-    virtual const node_vector &followpos() const
+    virtual const node_vector& followpos() const
     {
         throw runtime_error("Internal error node::followpos()");
     }
 
-    virtual node_vector &followpos()
+    virtual node_vector& followpos()
     {
         throw runtime_error("Internal error node::followpos()");
     }
@@ -110,9 +110,9 @@ private:
     node_vector _lastpos;
 
     // No copy construction.
-    basic_node(const basic_node &) = delete;
+    basic_node(const basic_node&) = delete;
     // No assignment.
-    const basic_node &operator =(const basic_node &) = delete;
+    const basic_node&operator =(const basic_node&) = delete;
 };
 }
 }

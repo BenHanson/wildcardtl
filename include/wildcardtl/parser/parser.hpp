@@ -10,9 +10,13 @@
 #include "tree/end_node.hpp"
 #include "tree/iteration_node.hpp"
 #include "tree/leaf_node.hpp"
+#include "tree/node.hpp"
 #include "tree/sequence_node.hpp"
-#include "../string_token.hpp"
 #include "tokeniser/tokeniser.hpp"
+
+#include <locale>
+#include <memory>
+#include <vector>
 
 namespace wildcardtl
 {
@@ -25,20 +29,20 @@ public:
     using node = basic_node<char_type>;
     using node_ptr_vector = std::vector<std::unique_ptr<node>>;
 
-    static node *parse(const char_type * &curr_, const char_type *end_,
-        node_ptr_vector &node_ptr_vector_, const bool icase_,
+    static node* parse(const char_type*& curr_, const char_type* end_,
+        node_ptr_vector& node_ptr_vector_, const bool icase_,
         const char_type zom_, const char_type any_, const char_type not_,
-        const std::locale &locale_)
+        const std::locale& locale_)
     {
-        node *root_ = nullptr;
-        typename tokeniser::string_token chars_;
+        node* root_ = nullptr;
+        string_token chars_;
 
         while (curr_ < end_)
         {
             typename tokeniser::e_Token eToken =
                 tokeniser::next(curr_, end_, chars_, icase_, zom_, any_,
                     not_, locale_);
-            node *node_ = nullptr;
+            node* node_ = nullptr;
 
             switch (eToken)
             {
@@ -62,7 +66,7 @@ public:
 
             if (root_)
             {
-                node *lhs_ = root_;
+                node* lhs_ = root_;
 
                 node_ptr_vector_.emplace_back(std::make_unique<sequence_node>
                     (lhs_, node_));
@@ -76,7 +80,7 @@ public:
 
         if (root_)
         {
-            node *rhs_ = nullptr;
+            node* rhs_ = nullptr;
 
             node_ptr_vector_.emplace_back(std::make_unique<end_node>());
             rhs_ = node_ptr_vector_.back().get();
@@ -94,6 +98,7 @@ protected:
     using leaf_node = basic_leaf_node<char_type>;
     using sequence_node = basic_sequence_node<char_type>;
     using tokeniser = basic_tokeniser<char_type>;
+    using string_token = typename tokeniser::string_token;
 };
 }
 }

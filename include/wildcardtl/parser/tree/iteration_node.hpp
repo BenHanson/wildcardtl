@@ -25,14 +25,14 @@ public:
     using node_vector = typename node::node_vector;
     using node_type = typename node::node_type;
 
-    explicit basic_iteration_node(node *next_) :
+    explicit basic_iteration_node(node* next_) :
         node(true),
         _next(next_)
     {
         _next->append_firstpos(node::firstpos());
         _next->append_lastpos(node::lastpos());
 
-        for (node *node_ : node::lastpos())
+        for (node* node_ : node::lastpos())
         {
             node_->append_followpos(node::firstpos());
         }
@@ -44,13 +44,13 @@ public:
 
 private:
     // Not owner of this pointer...
-    node *_next = nullptr;
+    node* _next = nullptr;
 
     // No copy construction.
-    basic_iteration_node(const basic_iteration_node &) = delete;
+    basic_iteration_node(const basic_iteration_node&) = delete;
     // No assignment.
-    const basic_iteration_node &operator =
-        (const basic_iteration_node &) = delete;
+    const basic_iteration_node& operator =
+        (const basic_iteration_node&) = delete;
 };
 }
 }

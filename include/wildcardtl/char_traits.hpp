@@ -7,8 +7,7 @@
 #ifndef WILDCARDTL_CHAR_TRAITS_H
 #define WILDCARDTL_CHAR_TRAITS_H
 
-// Make sure wchar_t is defined
-#include <string>
+#include <cstdint>
 
 namespace wildcardtl
 {
